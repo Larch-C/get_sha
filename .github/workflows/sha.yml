@@ -1,0 +1,15 @@
+name: Get remote master SHA (git ls-remote)
+on: workflow_dispatch
+
+jobs:
+  get-sha:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get sha using git ls-remote
+        id: git_sha
+        run: |
+          sha=$(git ls-remote https://github.com/AstrBotDevs/AstrBot.git refs/heads/master | cut -f1)
+          echo "sha=$sha" >> $GITHUB_OUTPUT
+
+      - name: Print
+        run: echo "latest sha = ${{ steps.git_sha.outputs.sha }}"
