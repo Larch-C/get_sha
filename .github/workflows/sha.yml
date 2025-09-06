@@ -4,18 +4,19 @@ on: workflow_dispatch
 jobs:
   git-ls:
     runs-on: ubuntu-latest
-    outputs:
-      sha: ${{ steps.get_sha.outputs.sha }}
     steps:
       - name: Get sha using git ls-remote
         id: get_sha
         run: |
           sha=$(git ls-remote https://github.com/AstrBotDevs/AstrBot.git refs/heads/master | cut -f1)
           echo "sha=$sha" >> $GITHUB_OUTPUT
-          # 写到 step summary（UI 明显）
-          printf "## 🔎 git ls-remote result\n\n**SHA:** `%s`\n\n" "$sha" >> "$GITHUB_STEP_SUMMARY"
-          # 大标记输出到日志
-          echo ">>>>>> LATEST MASTER SHA: $sha <<<<<<"
-
-      - name: Print sha
-        run: echo "sha = ${{ steps.get_sha.outputs.sha }}"
+          echo ">>> got sha: $sha"
+          
+      - name: Publish SHA to job summary (visible)
+        if: always()
+        run: |
+          echo "## 🔎 git ls-remote result" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "SHA: ${{ steps.get_sha.outputs.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo ">>>>>> LATEST MASTER SHA: ${{ steps.get_sha.outputs.sha }} <<<<<<"
